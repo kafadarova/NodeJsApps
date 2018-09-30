@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 // Simplify the file paths
 const path = require('path');
 const expressValidator = require('express-validator');
+const mongojs = require('mongojs');
+let db = mongojs('customerapp', ['users']); // Declare the database + collection
 
 const app = express();
 
@@ -74,12 +76,15 @@ let users = [
 // Visit an app/website is a GET request
 // Submitting a form - POST request
 app.get('/', (req, res) => {
-  // res.json(person);
-  // res.send('Hello World');
-  res.render('index', {
-    title: 'Customers',
-    users: users
-  });
+  db.users.find(function (err, docs) {
+    console.log(docs);
+    // res.json(person);
+    // res.send('Hello World');
+    res.render('index', {
+      title: 'Customers',
+      users: users
+    });
+  })
 });
 
 // Catch the submisson of the form from the index html
