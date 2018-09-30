@@ -4,7 +4,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const expressValidator = require('express-validator');
 const mongojs = require('mongojs');
-let db = mongojs('customerapp', ['users']); // Declare the database + collection
+const db = mongojs('customerapp', ['users']); // Declare the database + collection
+let ObjectId = mongojs.ObjectId;
 
 const app = express();
 
@@ -51,38 +52,17 @@ app.use(expressValidator({
   }
 }));
 
-let users = [
-{
-  id: 1,
-  first_name: 'Kristin',
-  last_name: 'Kafadarova',
-  email: 'kkafadarova@gmail.com'
-},
-{
-  id: 2,
-  first_name: 'Eva',
-  last_name: 'Kafadarova',
-  email: 'ekafadarova@gmail.com'
-},
-{
-  id: 3,
-  first_name: 'Mariya',
-  last_name: 'Kafadarova',
-  email: 'mkafadarova@gmail.com'
-}
-];
-
 // Routes
 // Visit an app/website is a GET request
 // Submitting a form - POST request
 app.get('/', (req, res) => {
   db.users.find(function (err, docs) {
-    console.log(docs);
+    // console.log(docs);
     // res.json(person);
     // res.send('Hello World');
     res.render('index', {
       title: 'Customers',
-      users: users
+      users: docs // Fetch from the db
     });
   })
 });
@@ -109,10 +89,24 @@ app.post('/users/add',(req,res) => {
       last_name: req.body.last_name,
       email: req.body.email
     };
-  console.log('Success');
+    db.users.insert(newUser,(err, result) => {
+      if(err){
+        console.log(err);
+      }
+      res.redirect('/');
+    });
     }
 });
 
+// Make a delete route
+app.delete('/users/delete/:id',(req,res) => {
+  db.users.remove({_id: ObjectId(req.params.id)}, (err,result) => {
+    if(err){
+      console.log(err);
+    }
+    res.redirect('/');
+  });
+});
 // Listen to a port & set a callback function
 app.listen(3000, () => {
   console.log('Server Started on Port 3000..');

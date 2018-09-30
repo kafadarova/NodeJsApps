@@ -23,7 +23,7 @@
   <ul>
   <% users.forEach((user) => { %>
     <li><%= user.first_name %> <%=
-      user.last_name%></li>
+      user.last_name%> - <a href="#" class="deleteUser" data-id="<%= user._id %>">Delete</a></li>
   <%  }) %>
   </ul>
 <% include partials/footer %>
