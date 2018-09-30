@@ -25,6 +25,11 @@ app.use(bodyParser.urlencoded({extended: false}));
 // Set Static Path
 app.use(express.static(path.join(__dirname,'public')));
 
+// Global Variables
+app.use((req, res, next) => {
+  res.locals.errors = null;
+  next();
+})
 // Add an express validator middleware
 // Set error formatting
 app.use(expressValidator({
@@ -87,7 +92,11 @@ app.post('/users/add',(req,res) => {
 
   let errors = req.validationErrors();
   if (errors) {
-    console.log('errors');
+    res.render('index', {
+      title: 'Customers',
+      users: users,
+      errors: errors
+    });
   } else {
     // If there arent any errors - create an object
     let newUser = {
@@ -95,8 +104,8 @@ app.post('/users/add',(req,res) => {
       last_name: req.body.last_name,
       email: req.body.email
     };
-  }
   console.log('Success');
+    }
 });
 
 // Listen to a port & set a callback function
