@@ -10,7 +10,17 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = keys.secretOrKey;
 
 module.exports = passport => {
-  passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
-    console.log(jwt_payload);
-  }));
+  passport.use(new JwtStrategy(opts, async (jwtPayload, done) => {
+    // console.log(jwt_payload);
+    try {
+      const user = await User.findById(jwtPayload.id) // this object has the user id in it
+      if (user) { //if user has been found
+        return done(null, user); // two parameters - 1.errors - there arent any, 2.the user   
+      }
+      return done(null, false); // there is no user 
+    } catch (e) {
+      console.log(e);
+    }
+  })
+);
 };
