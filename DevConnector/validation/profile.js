@@ -22,6 +22,45 @@ if(Validator.isEmpty(data.status)) {
 if(Validator.isEmpty(data.skills)) {
   errors.skills = 'Skills field is required';
 }
+
+if (!isEmpty(data.website)) {
+    if (!Validator.isURL(data.website)) {
+      errors.website = 'Not a valid URL';
+    }
+}
+
+if (!isEmpty(data.twitter)) {
+    if (!Validator.isURL(data.twitter)) {
+      errors.twitter = 'Not a valid URL';
+    }
+}
+
+if (!isEmpty(data.youtube)) {
+    if (!Validator.isURL(data.youtube)) {
+      errors.youtube = 'Not a valid URL';
+    }
+}
+
+if (!isEmpty(data.facebook)) {
+    if (!Validator.isURL(data.facebook)) {
+      errors.facebook = 'Not a valid URL';
+    }
+}
+
+if (!isEmpty(data.linkedin)) {
+    if (!Validator.isURL(data.linkedin)) {
+      errors.linkedin = 'Not a valid URL';
+    }
+}
+
+if (!isEmpty(data.instagram)) {
+    if (!Validator.isURL(data.instagram)) {
+      errors.instagram = 'Not a valid URL';
+    }
+}
+
+// return all values
+// it is valid if all the errors are empty
   return {
     errors: errors,
     isValid: isEmpty(errors) // check if it is empty

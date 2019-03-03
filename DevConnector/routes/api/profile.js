@@ -3,6 +3,9 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 
+// Load Validation
+const validateProfileInput = require('../../validation/profile')
+
 // Load Profile Model
 const Profile = require('../../models/Profile');
 // Load User Model
@@ -34,8 +37,18 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
 // @route   Post to api/profile
 // @desc    Create or edit user profile
 // @access  Private
-router.post('/', passport.authenticate('jwt', { session: false }), (req, res) => { // protected route - we will get a token
-  // Get field
+router.post(
+  '/', 
+  passport.authenticate('jwt', { session: false }), 
+  (req, res) => { // protected route - we will get a token
+    const {errors, isValid} = validateProfileInput(req.body);
+    
+    //Check Validation
+    if (!isValid) {
+      // Return any errors with 400 status
+      return res.status(400).json(errors);
+    }
+  // Get fields
   const profileFields = {};
   profileFields.user = req.user.id; // get from the logged in user
   if (req.body.handle) profileFields.handle = req.body.handle; 
@@ -68,6 +81,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
       
       // Check if handle exists
       Profile.findOne({ handle: profileFields.handle})
+      .populate('user', ['name', 'avatar'])
       .then(profile => {
         if(profile) {
           errors.handle= 'That handle already exists';
