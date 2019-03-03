@@ -24,6 +24,7 @@ router.get('/test', (req, res) =>{
 router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => { // protected route - we will get a token
   const errors = {};
   Profile.findOne({ user: req.user.id})
+  .populate('user', ['name', 'avatar'])
     .then(profile => { // get the prfile which it gives us
       if (!profile) {
         errors.noprofile = 'There is no profile for this user';        
@@ -32,6 +33,13 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
       res.json(profile);
     })
     .catch(err => res.status(404).json(err));
+});
+
+// @route   GET to api/profile/handle/:handle
+// @desc    Get profile by handle
+// @access  Public
+router.get('/handle/:handle', (req, res) => {
+  
 });
 
 // @route   Post to api/profile
@@ -72,7 +80,7 @@ router.post(
   
   Profile.findOne({user: req.user.id})
   .then(profile => {
-    if(profile) {
+    if(!profile) {
       // Update
       Profile.findOneAndUpdate({ user: req.user.id}, { $set: profileFields}, {new: true}) //update the profile with the new infos
       .then(profile => res.json(profile)); // adter update respond with the updated profile
@@ -81,11 +89,10 @@ router.post(
       
       // Check if handle exists
       Profile.findOne({ handle: profileFields.handle})
-      .populate('user', ['name', 'avatar'])
       .then(profile => {
-        if(profile) {
+        if(!profile) {
           errors.handle= 'That handle already exists';
-          res.status(400).json(errors);
+          res.status(404).json(errors);
         }
         
         //Save profile
