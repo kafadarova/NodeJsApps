@@ -35,6 +35,23 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
     .catch(err => res.status(404).json(err));
 });
 
+// @route   GET to api/profile/all
+// @desc    Get all profiles
+// @access  Public
+router.get('/all', (req, res) => {
+  const errors = {};
+  Profile.find() 
+    .populate('user', ['name', 'avatar'])
+    .then(profiles => {
+      if (!profiles) {
+        errors.noprofile = 'There are no profiles for this user id';
+        return res.status(404).json(errors);
+      }
+      res.json(profiles); // will return 200
+    })
+    .catch(err => res.status(404).json({profile: 'There are no profiles'}));
+});
+
 // @route   GET to api/profile/handle/:handle
 // @desc    Get profile by handle
 // @access  Public
@@ -66,9 +83,9 @@ router.get('/user/:user_id', (req, res) => {
       }
       res.json(profile); // will return 200
     })
-    .catch(err => res.status(404).json(err));
+    .catch(err => res.status(404).json({profile: 'There is no profile for this user id'}));
 });
-
+ 
 // @route   Post to api/profile
 // @desc    Create or edit user profile
 // @access  Private
@@ -93,6 +110,7 @@ router.post(
   if (req.body.bio) profileFields.bio = req.body.bio;
   if (req.body.status) profileFields.status = req.body.status;
   if (req.body.githubusername) profileFields.githubusername = req.body.githubusername;
+  
   //Skills - Split into array
   if (typeof req.body.skills !== 'undefined') {
     profileFields.skills = req.body.skills.split(','); // make an array with the skills
@@ -107,7 +125,7 @@ router.post(
   
   Profile.findOne({user: req.user.id})
   .then(profile => {
-    if(!profile) {
+    if(profile) {
       // Update
       Profile.findOneAndUpdate({ user: req.user.id}, { $set: profileFields}, {new: true}) //update the profile with the new infos
       .then(profile => res.json(profile)); // adter update respond with the updated profile

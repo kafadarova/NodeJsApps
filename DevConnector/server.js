@@ -23,7 +23,8 @@ const options = {
   reconnectInterval: 1000,
   reconnectTries: Number.MAX_VALUE,
   useNewUrlParser: true,
-  autoReconnect: true
+  autoReconnect: true,
+  useFindAndModify: false
 };
 
 // Connect to MongoDB
