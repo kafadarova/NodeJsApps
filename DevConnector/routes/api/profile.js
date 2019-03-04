@@ -55,9 +55,9 @@ router.get('/handle/:handle', (req, res) => {
 // @route   GET to api/profile/user/:user_id
 // @desc    Get profile by user id
 // @access  Public
-router.get('/handle/:handle', (req, res) => {
+router.get('/user/:user_id', (req, res) => {
   const errors = {};
-  Profile.findOne({user: req.params.user}) //not only loged in user, but whatever user is passed in
+  Profile.findOne({user: req.params.user_id}) // not only loged in user, but whatever user is passed in
     .populate('user', ['name', 'avatar'])
     .then(profile => {
       if (!profile) {
