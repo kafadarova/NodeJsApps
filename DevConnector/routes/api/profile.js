@@ -39,7 +39,34 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
 // @desc    Get profile by handle
 // @access  Public
 router.get('/handle/:handle', (req, res) => {
-  
+  const errors = {};
+  Profile.findOne({handle: req.params.handle}) //req.params.handle - will grab /:handle from URL
+    .populate('user', ['name', 'avatar'])
+    .then(profile => {
+      if (!profile) {
+        errors.noprofile = "There is no profile for this user";
+        res.status(404).json(errors);
+      }
+      res.json(profile); // will return 200
+    })
+    .catch(err => res.status(404).json(err));
+});
+
+// @route   GET to api/profile/user/:user_id
+// @desc    Get profile by user id
+// @access  Public
+router.get('/handle/:handle', (req, res) => {
+  const errors = {};
+  Profile.findOne({user: req.params.user}) //not only loged in user, but whatever user is passed in
+    .populate('user', ['name', 'avatar'])
+    .then(profile => {
+      if (!profile) {
+        errors.noprofile = "There is no profile for this user";
+        res.status(404).json(errors);
+      }
+      res.json(profile); // will return 200
+    })
+    .catch(err => res.status(404).json(err));
 });
 
 // @route   Post to api/profile
