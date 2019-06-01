@@ -28,6 +28,7 @@ app.get('/', (req,res) => {
   res.redirect('/blogs');
 });
 
+// INDEX Router
 app.get('/blogs', (req, res) => {
   Blog.find({}, (err, blogs) => {
     if (err) {
@@ -37,6 +38,12 @@ app.get('/blogs', (req, res) => {
     }
   });
 });
+
+// NEW Route
+app.get('/blogs/new', function(req,res) {
+  res.render('new');
+});
+
 const port = process.env.port || 3000;
 
 app.listen(port,() => {
