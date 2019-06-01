@@ -7,14 +7,12 @@ const bodyParser = require('body-parser'),
 mongoose.connect('mongodb://localhost/restfull_blog_app', {
   useNewUrlParser: true
 });
-app.set('view engine', 'ejs');
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(bodyParser.urlencoded({extended : true}));
+app.set('view engine', 'ejs');
 
 // mongoose/model config
-const blogScema = new mongoose.Schema({
+const blogSchema = new mongoose.Schema({
   title: String,
   image: String,
   body: String,
@@ -23,11 +21,24 @@ const blogScema = new mongoose.Schema({
     default: Date.now
   }
 });
-const Blog = mongoose.model('Blog', blogScema)
+const Blog = mongoose.model('Blog', blogSchema);
 
 // RESTful routes
+app.get('/', (req,res) => {
+  res.redirect('/blogs');
+});
 
+app.get('/blogs', (req, res) => {
+  Blog.find({}, (err, blogs) => {
+    if (err) {
+      console.log('Error!');
+    } else {
+      res.render('index', {blogs: blogs});
+    }
+  });
+});
+const port = process.env.port || 3000;
 
-app.listen(process.env.PORT, process.env.IP, function() {
-  console.log('SERVER IS RUNNING!');
-})
+app.listen(port,() => {
+     console.log('SERVER IS RUNNING!');
+});
