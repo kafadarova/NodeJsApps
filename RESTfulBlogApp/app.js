@@ -43,14 +43,14 @@ app.get('/blogs', (req, res) => {
 });
 
 // NEW Route
-app.get('/blogs/new', function(req,res) {
+app.get('/blogs/new', (req,res) => {
   res.render('new');
 });
 
 // CREATE Route
-app.post('/blogs', function(req,res) {
+app.post('/blogs', (req,res) => {
   // create blog
-  Blog.create(req.body.blog, function(err, newBlog) {
+  Blog.create(req.body.blog, (err, newBlog) => {
     if (err) {
       res.render('new');
     } else {
@@ -61,8 +61,8 @@ app.post('/blogs', function(req,res) {
 });
 
 // SHOW Route
-app.get('/blogs/:id', function(req,res){
-  Blog.findById(req.params.id, function(err, foundBlog) {
+app.get('/blogs/:id', (req,res) => {
+  Blog.findById(req.params.id, (err, foundBlog) => {
     if (err) {
       res.redirect('/blogs');
     } else {
@@ -84,7 +84,7 @@ app.get('/blogs/:id/edit', (req,res) => {
 
 // UPDATE Route
 app.put('/blogs/:id', (req,res) => {
-  Blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, updatedBlog){
+  Blog.findByIdAndUpdate(req.params.id, req.body.blog, (err, updatedBlog) => {
     if (err) {
       res.redirect('/blogs');
     } else {
@@ -93,6 +93,17 @@ app.put('/blogs/:id', (req,res) => {
   });
 });
 
+// DELETE Route
+app.delete('/blogs/:id', (req,res) => {
+  // destroy blog
+  Blog.findByIdAndRemove(req.params.id, (req,res) => {
+    if (err) {
+      res.redirect('/blogs');
+    } else {
+      res.redirect('/blogs');
+    }
+  });
+})
 
 const port = process.env.port || 3000;
 
