@@ -1,5 +1,6 @@
 const bodyParser = require('body-parser'),
   methodOverride = require('method-override'),
+  expressSanitizer = require('expressSanitizer'),
   mongoose = require('mongoose'),
   express = require('express'),
   app = express();
@@ -11,8 +12,10 @@ mongoose.connect('mongodb://localhost/restfull_blog_app', {
 });
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended : true}));
-app.set('view engine', 'ejs');
+// this should go afte bodyParser!!
+app.use(expressSanitizer);
 app.use(methodOverride('_method'));
+app.set('view engine', 'ejs');
 
 // mongoose/model config
 const blogSchema = new mongoose.Schema({
@@ -50,6 +53,7 @@ app.get('/blogs/new', (req,res) => {
 // CREATE Route
 app.post('/blogs', (req,res) => {
   // create blog
+  req.body.blog.body = req.sanitize(req.body.blog.body);
   Blog.create(req.body.blog, (err, newBlog) => {
     if (err) {
       res.render('new');
@@ -84,6 +88,7 @@ app.get('/blogs/:id/edit', (req,res) => {
 
 // UPDATE Route
 app.put('/blogs/:id', (req,res) => {
+  req.body.blog.body = req.sanitize(req.body.blog.body);
   Blog.findByIdAndUpdate(req.params.id, req.body.blog, (err, updatedBlog) => {
     if (err) {
       res.redirect('/blogs');
