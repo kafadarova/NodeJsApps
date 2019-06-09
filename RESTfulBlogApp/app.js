@@ -1,6 +1,6 @@
 const bodyParser = require('body-parser'),
   methodOverride = require('method-override'),
-  expressSanitizer = require('expressSanitizer'),
+  expressSanitizer = require('express-sanitizer');
   mongoose = require('mongoose'),
   express = require('express'),
   app = express();
@@ -13,7 +13,7 @@ mongoose.connect('mongodb://localhost/restfull_blog_app', {
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended : true}));
 // this should go afte bodyParser!!
-app.use(expressSanitizer);
+app.use(expressSanitizer());
 app.use(methodOverride('_method'));
 app.set('view engine', 'ejs');
 
