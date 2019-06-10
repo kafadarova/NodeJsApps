@@ -5,12 +5,25 @@ const express = require('express'),
       localStrategy = require('passport-local'),
       passportLocalMongoose = require('passport-local-mongoose'),
       User = require('./models/user');
-
-const app = express();
-app.set('view engine', 'ejs');
+      
 mongoose.connect('mongodb://localhost/auth_demo_app', {
   useNewUrlParser: true
 });
+
+const app = express();
+app.set('view engine', 'ejs');
+
+app.use(require('express-session')({
+  secret: 'Jerry is the sweeetest dog in the world',
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(passport.initialize()); // use passport
+app.use(passport.session());
+
+// reading the session 
+passport.serializeUser(User.serializeUser()); // encode the session
+passport.deserializeUser(User.deserializeUser()); //decode the session
 
 app.get('/', (req, res) => {
   res.render('home');
