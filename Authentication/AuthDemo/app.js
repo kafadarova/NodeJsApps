@@ -1,11 +1,11 @@
 const express = require('express'),
-      mongoose = require('mongoose'),
-      passport = require('passport'),
-      bodyParser = require('body-parser'),
-      localStrategy = require('passport-local'),
-      passportLocalMongoose = require('passport-local-mongoose'),
-      User = require('./models/user');
-      
+  mongoose = require('mongoose'),
+  passport = require('passport'),
+  bodyParser = require('body-parser'),
+  localStrategy = require('passport-local'),
+  passportLocalMongoose = require('passport-local-mongoose'),
+  User = require('./models/user');
+
 mongoose.connect('mongodb://localhost/auth_demo_app', {
   useNewUrlParser: true
 });
@@ -23,6 +23,7 @@ app.use(require('express-session')({
 app.use(passport.initialize()); // use passport
 app.use(passport.session());
 
+passport.use(new localStrategy(User.authenticate()));
 // reading the session 
 passport.serializeUser(User.serializeUser()); // encode the session
 passport.deserializeUser(User.deserializeUser()); //decode the session
@@ -34,7 +35,7 @@ app.get('/', (req, res) => {
   res.render('home');
 });
 
-app.get('secret', (req, res) => {
+app.get('/secret', (req, res) => {
   res.render('secret');
 });
 
@@ -46,19 +47,36 @@ app.get('/register', (req, res) => {
 
 // handling user sign up
 app.post('/register', (req, res) => {
-  User.register(new User({username: req.body.username}), req.body.password, (err, user) => {
+  User.register(new User({
+    username: req.body.username
+  }), req.body.password, (err, user) => {
     if (err) {
       console.log(err);
       return res.render('register');
-    } 
+    }
     // log the user in
     // run serializeUser
     passport.authenticate('local')(req, res, () => {
       res.redirect('/secret');
-    })
-  })
+    });
+  });
 });
 const port = process.env.port || 3002;
+
+// Login Routes
+// render login form
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+// login logic
+// middleware - between the begging the route and the end of it
+// authenticate the credentials
+app.post('/login', passport.authenticate('local', { 
+  successRedirect: '/secret',
+  failureRedirect: '/login'
+}),(req, res) => {
+});
 
 app.listen(port, () => {
   console.log('server started ..');
