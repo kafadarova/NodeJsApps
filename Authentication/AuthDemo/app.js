@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
   res.render('home');
 });
 
-app.get('/secret', (req, res) => {
+app.get('/secret', isLoggedIn, (req, res) => {
   res.render('secret');
 });
 
@@ -77,6 +77,20 @@ app.post('/login', passport.authenticate('local', {
   failureRedirect: '/login'
 }),(req, res) => {
 });
+
+// Logout Route
+app.get('/logout', (req, res) => {
+  req.logout(); //passport destoying all the user data
+  res.redirect('/');
+});
+
+// middleware to check if the user is loggedin
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  } 
+  res.redirect('/login');
+}
 
 app.listen(port, () => {
   console.log('server started ..');
